@@ -15,5 +15,7 @@ from django.db import models
 """
 
 class CustomUser(AbstractUser):
+    username = models.CharField('Никнейм', max_length=150, unique=True)
+    email = models.CharField('Почта', max_length=150, unique=True)
     bio = models.TextField('Биография', blank=True)
     role = models.CharField('Роль', max_length=150, default='user')
