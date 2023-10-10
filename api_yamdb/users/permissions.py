@@ -29,7 +29,7 @@ class OwnerOrStaff(AdminOrReadOnly):
     def has_permission(self, request, view):
         return (
             super().has_permission(self, request, view)
-            or request.user.is_authenticated
+            or request.user.is_authenticated()
             or request.user.role == 'moderator'
         )
     
