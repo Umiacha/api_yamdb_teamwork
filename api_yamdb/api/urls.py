@@ -7,5 +7,6 @@ router = SimpleRouter()
 router.register(r'titles', TitleViewSet, basename='titles')
 
 urlpatterns = [
-    path('v1/', include(router.urls))
+    path('v1/', include(router.urls)),
+    path('v1/', include('users.urls')),
 ]
