@@ -9,7 +9,7 @@ class IsAdminOrSuperuser(BasePermission):
             request.user.role == 'admin'
             or request.user.is_superuser
         )
-    
+
     def has_object_permission(self, request, view, obj):
         return (
             request.user.role == 'admin'
@@ -19,7 +19,7 @@ class IsAdminOrSuperuser(BasePermission):
 
 class AdminOrReadOnly(IsAdminOrSuperuser):
     """Редактировать может только админ. Чтение -- любой.
-    
+
     Суперюзер == админ.
     """
     def has_permission(self, request, view):
@@ -27,7 +27,7 @@ class AdminOrReadOnly(IsAdminOrSuperuser):
             request.method in SAFE_METHODS
             or super().has_permission(self, request, view)
         )
-    
+
     def has_object_permission(self, request, view, obj):
         return (
             request.method in SAFE_METHODS
@@ -37,7 +37,7 @@ class AdminOrReadOnly(IsAdminOrSuperuser):
 
 class OwnerOrStaff(AdminOrReadOnly):
     """Редактировать может либо автор, либо админ/модератор.
-    
+
     Суперюзер == админ.
     """
     def has_permission(self, request, view):
@@ -46,7 +46,7 @@ class OwnerOrStaff(AdminOrReadOnly):
             or request.user.is_authenticated()
             or request.user.role == 'moderator'
         )
-    
+
     def has_object_permission(self, request, view, obj):
         return (
             super().has_permission(self, request, view)
