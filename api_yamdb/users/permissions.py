@@ -1,7 +1,23 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
-class AdminOrReadOnly(BasePermission):
+class IsAdminOrSuperuser(BasePermission):
+    """Доступен только админу или суперпользователю.
+    """
+    def has_permission(self, request, view):
+        return (
+            request.user.role == 'admin'
+            or request.user.is_superuser
+        )
+    
+    def has_object_permission(self, request, view, obj):
+        return (
+            request.user.role == 'admin'
+            or request.user.is_superuser
+        )
+
+
+class AdminOrReadOnly(IsAdminOrSuperuser):
     """Редактировать может только админ. Чтение -- любой.
     
     Суперюзер == админ.
@@ -9,15 +25,13 @@ class AdminOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         return (
             request.method in SAFE_METHODS
-            or request.user.is_staff
-            or request.user.is_superuser
+            or super().has_permission(self, request, view)
         )
     
     def has_object_permission(self, request, view, obj):
         return (
             request.method in SAFE_METHODS
-            or request.user.is_staff
-            or request.user.is_superuser
+            or super().has_object_permission(self, request, view, obj)
         )
 
 
