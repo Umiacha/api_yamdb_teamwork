@@ -2,8 +2,6 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 
-USERS_ROLES = ['user', 'moderator', 'admin',]
-
 User = get_user_model()
 
 
