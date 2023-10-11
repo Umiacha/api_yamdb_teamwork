@@ -27,6 +27,6 @@ class CustomUser(AbstractUser):
         ('admin', 'admin'),
     ]
     username = models.CharField('Никнейм', max_length=150, unique=True, validators=[check_name])
-    email = models.CharField('Почта', max_length=150, unique=True)
+    email = models.CharField('Почта', max_length=254, unique=True)
     bio = models.TextField('Биография', blank=True)
     role = models.CharField('Роль', max_length=150, default='user', choices=USERS_ROLES)
