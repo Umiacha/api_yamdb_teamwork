@@ -53,7 +53,7 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name="rewiews",
+        related_name="reviews",
     )
     text = models.TextField()
     author = models.ForeignKey(
@@ -69,7 +69,9 @@ class Review(models.Model):
 
     @staticmethod
     def calc_average_score():
-        return Review.objects.aggregate(models.Avg("score"))["score__avg"] or 0
+        return (
+            Review.objects.aggregate(models.Avg("score"))["score__avg"] or 0.0
+        )
 
     def __str__(self):
         return self.text
