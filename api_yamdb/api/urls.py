@@ -10,5 +10,6 @@ router.register(r'genres', GenreViewSet, basename='genres')
 router.register(r'categories', CategoryViewSet, basename='categories')
 
 urlpatterns = [
-    path('v1/', include(router.urls))
+    path('v1/', include(router.urls)),
+    path('v1/', include('users.urls')),
 ]
