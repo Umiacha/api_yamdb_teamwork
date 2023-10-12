@@ -28,7 +28,7 @@ def get_token(request):
     if not confirmation_code or confirmation_code != 1:
         return Response(data={"confirmation_code": "Отсутствует поле или оно некорректно!"}, status=status.HTTP_400_BAD_REQUEST)
     user_token = jwt.encode(
-        payload={'uid': user.id, ...},  # Тут 100% будет "exp" со значением из настроек, но... Что еще?
+        payload={'uid': user.id},  # Тут 100% будет "exp" со значением из настроек, но... Что еще?
         key='secret',  # думаю, надо будет это как-то поменять!
         algorithm='HS256'
     )
