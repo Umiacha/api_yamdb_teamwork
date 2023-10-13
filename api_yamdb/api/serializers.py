@@ -2,7 +2,7 @@ import datetime as dt
 
 from rest_framework import serializers
 
-from reviews.models import Title, Genre, Category
+from reviews.models import Title, Genre, Category, Review
 
 
 class CategorySerializer(serializers.ModelSerializer):
