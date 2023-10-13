@@ -59,5 +59,4 @@ class UserViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     serializer_class = UserSerializer
 
     def get_object(self):
-        return self.request.user  # отключаю пока что, тк нет токенов.
-        # return User.objects.first()
+        return self.request.user

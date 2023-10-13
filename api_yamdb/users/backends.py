@@ -7,12 +7,6 @@ from rest_framework.authentication import BaseAuthentication, get_authorization_
 from rest_framework.exceptions import AuthenticationFailed
 
 
-# Задача: по статье (https://habr.com/ru/articles/538040/) создать динамический метод пользователя token
-# и создать здесь бэкенд для проверки jwt-токена.
-# Цель: проверить, учитывается ли время жизни токена ('exp') автоматически и скорректировать выдачу токена.
-# 
-# Задача: продумать, как в эту систему встроить confirmation_code (желательно, без сохранения в БД).
-
 User = get_user_model()
 
 
@@ -23,14 +17,12 @@ class JWTAuthentification(BaseAuthentication):
         request.user = None
         auth_header = get_authorization_header(request).split()
         
-        # Если заголовка нет или он некорректен, то пользователь считается анонимным.
         if not auth_header or len(auth_header) == 1 or len(auth_header) > 2:
             return None
         
         prefix = auth_header[0].decode('utf-8')
         token = auth_header[1].decode('utf-8')
         
-        # Если не тот префикс, которые мы ожидали.
         if prefix != self.AUTH_HEADER_PREFIX:
             return None
         
