@@ -4,7 +4,7 @@ from .models import CustomUser
 
 
 class UserAdmin(admin.ModelAdmin):
-    exclude = ('groups',)  # Не получилось, но надо выкинуть это поле из админки + настроить при создании пользователя admin выставлять User.is_staff = True
+    exclude = ('groups',)
 
 
-admin.site.register(CustomUser)
+admin.site.register(CustomUser, UserAdmin)

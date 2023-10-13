@@ -10,7 +10,7 @@ def check_name(value):
         )
 
 
-class CustomUser(AbstractUser):
+class CustomUser(AbstractUser):  # Проблема: админу для доступа к AdminSite нужно поле password, но его вообще никак не задать через api
     USERS_ROLES = [
         ('user', 'user'),
         ('moderator', 'moderator'),
@@ -22,6 +22,13 @@ class CustomUser(AbstractUser):
     bio = models.TextField('Биография', blank=True)
     role = models.CharField('Роль', max_length=150,
                             default='user', choices=USERS_ROLES)
+    
+    def clean_is_staff(self) -> None:
+        if self.role == 'admin' or self.is_superuser:
+            self.is_staff = True
+        else:
+            self.is_staff = False
+        return super().clean()
 
     def __str__(self):
         return self.username
