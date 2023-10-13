@@ -12,7 +12,7 @@ from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.filters import SearchFilter
 from rest_framework.exceptions import NotFound
 
-from .serializers import UserSerializer
+from .serializers import AdminSerializer, UserSerializer
 
 
 User = get_user_model()
@@ -49,7 +49,7 @@ def get_token(request):
 
 class AdminViewSet(ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = AdminSerializer
     lookup_field = 'username'
     filter_backends = (SearchFilter,)
     search_fields = ('username',)
