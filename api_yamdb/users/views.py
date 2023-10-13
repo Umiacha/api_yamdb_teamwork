@@ -19,7 +19,11 @@ User = get_user_model()
 
 
 def get_expiration_time():
-    return int((datetime.now() + timedelta(**settings.JWT_ACCESS_LIFETIME)).timestamp())
+    return int(
+        (datetime.now() + timedelta(
+            **settings.JWT_ACCESS_LIFETIME
+        )).timestamp()
+    )
 
 
 @api_view(['POST'])
@@ -28,14 +32,23 @@ def get_token(request):
     username = request.data.get('username', None)
     confirmation_code = request.data.get('confirmation_code', None)
     if not username:
-        return Response(data={"username": "Отсутствует поле или оно некорректно!"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            data={"username": "Отсутствует поле или оно некорректно!"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
         raise NotFound('Пользователь не найден!')
+
     # Пока почта не настроена, confirmation_code всегда должен быть 1!
     if not confirmation_code or confirmation_code != '1':
-        return Response(data={"confirmation_code": "Отсутствует поле или оно некорректно!"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            data={
+                "confirmation_code": "Отсутствует поле или оно некорректно!"
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
     user_token = jwt.encode(
         payload={
             'exp': get_expiration_time(),
