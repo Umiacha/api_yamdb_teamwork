@@ -22,3 +22,6 @@ class CustomUser(AbstractUser):
     bio = models.TextField('Биография', blank=True)
     role = models.CharField('Роль', max_length=150,
                             default='user', choices=USERS_ROLES)
+
+    def __str__(self):
+        return self.username
