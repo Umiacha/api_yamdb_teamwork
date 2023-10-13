@@ -1,6 +1,7 @@
 import jwt
 
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
 from rest_framework.exceptions import AuthenticationFailed
@@ -34,7 +35,7 @@ class JWTAuthentification(BaseAuthentication):
             return None
         
         try:
-            payload = jwt.decode(token, 'secret')  # Не, этот "secret" явно надо менять...
+            payload = jwt.decode(token, settings.SECRET_KEY)  # Не, этот "secret" явно надо менять...
         except Exception:
             raise AuthenticationFailed(
                 'Отказ в доступе: невозможно декодировать токен!'

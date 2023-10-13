@@ -117,3 +117,5 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'users.CustomUser'
+
+JWT_ACCESS_LIFETIME = {'minutes': 1}

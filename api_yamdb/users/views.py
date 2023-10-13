@@ -1,4 +1,7 @@
+from datetime import datetime, timedelta
+
 from django.contrib.auth import get_user_model
+from django.conf import settings
 import jwt
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -12,6 +15,10 @@ from .serializers import UserSerializer
 
 
 User = get_user_model()
+
+
+def get_expiration_time():
+    return int((datetime.now() + timedelta(**settings.JWT_ACCESS_LIFETIME)).timestamp())
 
 
 @api_view(['POST'])
@@ -28,8 +35,11 @@ def get_token(request):
     if not confirmation_code or confirmation_code != 1:
         return Response(data={"confirmation_code": "Отсутствует поле или оно некорректно!"}, status=status.HTTP_400_BAD_REQUEST)
     user_token = jwt.encode(
-        payload={'uid': user.id},  # Тут 100% будет "exp" со значением из настроек, но... Что еще?
-        key='secret',  # думаю, надо будет это как-то поменять!
+        payload={
+            'exp': get_expiration_time(),
+            'uid': user.id,
+        },
+        key=settings.SECRET_KEY,
         algorithm='HS256'
     )
     return Response(data={'token': user_token}, status=status.HTTP_200_OK)
