@@ -41,7 +41,7 @@ class Title(models.Model):
         "Рейтинг произведения", default=0
     )
     description = models.TextField(
-        "Описание", null=True, blank=True
+        "Описание", blank=True, default=''
     )
     genre = models.ManyToManyField(
         Genre, verbose_name="Slug жанра", through="GenreTitle"

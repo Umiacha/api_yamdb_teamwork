@@ -4,12 +4,16 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test, login_required
+
 from .models import (
     Title, Category, Genre, GenreTitle,
     Review, Comment, User
 )
 
 
+@login_required(login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser) # Досутп к представлению есть только у суперпользователя
 def upload_csv(request):
     "Функция для импорта CSV в базу данных"
     data = {}
@@ -78,6 +82,21 @@ def upload_csv(request):
                 except Exception as e:
                     messages.error(request, "Невозможно загрузить файл. "+repr(e))
                     pass
+            if csv_file.name == 'users.csv':
+                try:
+                    object = User(
+                        id=row[0],
+                        username=row[1],
+                        email=row[2],
+                        role=row[3],
+                        bio=row[4],
+                        first_name=row[5],
+                        last_name=[6]
+                    )
+                    object.save()
+                except Exception as e:
+                    messages.error(request, "Невозможно загрузить файл. "+repr(e))
+                    pass
             if csv_file.name == 'review.csv':
                 user_id = row[3]
                 author = get_object_or_404(User, id=user_id)
@@ -94,15 +113,18 @@ def upload_csv(request):
                 except Exception as e:
                     messages.error(request, "Невозможно загрузить файл. "+repr(e))
                     pass
-            if csv_file.name == 'user.csv':
+            if csv_file.name == 'comments.csv':
+                user_id = row[3]
+                author = get_object_or_404(User, id=user_id)
+                review_id = row[1]
+                review = get_object_or_404(Review, id=review_id)
                 try:
-                    object = User(
+                    object = Comment(
                         id=row[0],
-                        title_id=row[1],
+                        review=review,
                         text=row[2],
                         author=author,
-                        score=row[4],
-                        pub_date=row[5],
+                        pub_date=row[4],
                     )
                     object.save()
                 except Exception as e:
