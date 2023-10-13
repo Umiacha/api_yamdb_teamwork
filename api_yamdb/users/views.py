@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 from django.contrib.auth import get_user_model
 from django.conf import settings
 import jwt
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
@@ -22,6 +23,7 @@ def get_expiration_time():
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def get_token(request):
     username = request.data.get('username', None)
     confirmation_code = request.data.get('confirmation_code', None)
@@ -32,7 +34,7 @@ def get_token(request):
     except User.DoesNotExist:
         raise NotFound('Пользователь не найден!')
     # Пока почта не настроена, confirmation_code всегда должен быть 1!
-    if not confirmation_code or confirmation_code != 1:
+    if not confirmation_code or confirmation_code != '1':
         return Response(data={"confirmation_code": "Отсутствует поле или оно некорректно!"}, status=status.HTTP_400_BAD_REQUEST)
     user_token = jwt.encode(
         payload={
@@ -57,5 +59,5 @@ class UserViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     serializer_class = UserSerializer
 
     def get_object(self):
-        # return self.request.user  # отключаю пока что, тк нет токенов.
-        return User.objects.first()
+        return self.request.user  # отключаю пока что, тк нет токенов.
+        # return User.objects.first()

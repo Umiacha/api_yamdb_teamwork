@@ -108,9 +108,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
 REST_FRAMEWORK = {
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    # ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'users.backends.JWTAuthentification',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,
@@ -118,4 +121,4 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
-JWT_ACCESS_LIFETIME = {'minutes': 1}
+JWT_ACCESS_LIFETIME = {'days': 1}

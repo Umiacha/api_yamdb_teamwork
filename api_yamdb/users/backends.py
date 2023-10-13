@@ -35,7 +35,11 @@ class JWTAuthentification(BaseAuthentication):
             return None
         
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY)  # Не, этот "secret" явно надо менять...
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms='HS256')
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed(
+                'Время жизни токена истекло. Обновите токен!'
+            )
         except Exception:
             raise AuthenticationFailed(
                 'Отказ в доступе: невозможно декодировать токен!'
