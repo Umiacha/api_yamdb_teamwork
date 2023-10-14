@@ -48,7 +48,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = "__all__"
+        fields = "__all__" # потом надо явно указать поля
         validators = [
             UniqueTogetherValidator(
                 queryset=Review.objects.all(),
@@ -62,6 +62,6 @@ class CommentSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(read_only=True, slug_field="username")
 
     class Meta:
-        fields = "__all__"
+        fields = "__all__" # потом надо явно указать поля
         model = Comment
         read_only_fields = ("review",)

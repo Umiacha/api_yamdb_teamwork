@@ -42,10 +42,14 @@ python3 -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-6. Выполнить миграции:
+6. Выполнить миграции и загрузить данные в БД:
 
 ```
 python3 manage.py migrate
+```
+
+```
+python3 manage.py importcsv <пусть к файлу>
 ```
 
 7. Запустить проект:
