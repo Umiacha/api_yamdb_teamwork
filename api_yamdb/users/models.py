@@ -1,3 +1,5 @@
+import time
+
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -20,10 +22,11 @@ def check_name(value):
 class CustomUser(AbstractUser):
     username = models.CharField('Никнейм', max_length=150,
                                 unique=True, validators=[check_name, RegexValidator(regex='^[\w.@+-]+\Z')])
-    email = models.CharField('Почта', max_length=254, unique=True)
+    email = models.EmailField('Почта', max_length=254, unique=True)
     bio = models.TextField('Биография', blank=True)
     role = models.CharField('Роль', max_length=150,
                             default='user', choices=USERS_ROLES)
+    confirmation_code = models.CharField('Код подтверждения', max_length=150, blank=True)
     
     def clean_is_staff(self) -> None:
         if self.role == 'admin' or self.is_superuser:
@@ -31,6 +34,14 @@ class CustomUser(AbstractUser):
         else:
             self.is_staff = False
         return super().clean()
+    
+    def create_confirmation_code(self):
+        """
+        Create, set for user instance and return confirmation code.
+        """
+        self.confirmation_code = str(int(time.time()))
+        self.save()
+        return self.confirmation_code
 
     def __str__(self):
         return self.username
