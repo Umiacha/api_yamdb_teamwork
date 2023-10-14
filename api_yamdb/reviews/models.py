@@ -37,7 +37,7 @@ class Title(models.Model):
         "Год выпуска",
         validators=[MaxValueValidator(timezone.now().year)],
     )
-    rating = models.IntegerField("Рейтинг произведения", default=0)
+    rating = models.FloatField("Рейтинг произведения", default=0.0)
     description = models.TextField("Описание", blank=True, default="")
     genre = models.ManyToManyField(
         Genre, verbose_name="Slug жанра", through="GenreTitle"
@@ -64,7 +64,7 @@ class GenreTitle(models.Model):
 
 
 class Review(models.Model):
-    title_id = models.ForeignKey(
+    title = models.ForeignKey(
         Title,
         verbose_name="ID произведения",
         on_delete=models.CASCADE,
@@ -77,27 +77,29 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name="reviews",
     )
-    score = models.FloatField(
+    score = models.IntegerField(
         "Оценка произведения",
         validators=[
-            MinValueValidator(limit_value=0.0),
-            MaxValueValidator(limit_value=10.0),
+            MinValueValidator(limit_value=1),
+            MaxValueValidator(limit_value=10),
         ],
     )
     pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
 
     @staticmethod
     def calc_average_score():
-        return (
-            Review.objects.aggregate(models.Avg("score"))["score__avg"] or 0.0
-        )
+        return Review.objects.aggregate(models.Avg("score"))["score__avg"] or 0
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         self.title.rating = self.calc_average_score()
         self.title.save()
 
-    def __str__(self):
+    class Meta:
+        verbose_name = "Обзор"
+        verbose_name_plural = "Обзоры"
+
+    def __str__(self) -> str:
         return self.text
 
 
@@ -119,5 +121,9 @@ class Comment(models.Model):
         "Дата добавления", auto_now_add=True, db_index=True
     )
 
-    def __str__(self):
+    class Meta:
+        verbose_name = "Комментарий"
+        verbose_name_plural = "Комментарии"
+
+    def __str__(self) -> str:
         return self.text

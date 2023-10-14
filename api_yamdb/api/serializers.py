@@ -2,6 +2,7 @@ import datetime as dt
 
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
+from rest_framework.validators import UniqueTogetherValidator
 
 from reviews.models import Title, Genre, Category, Review, Comment
 
@@ -48,6 +49,13 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = "__all__"
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Review.objects.all(),
+                fields=["title", "author"],
+                message="Ошибка, Вы уже добавили обзор на произведение",
+            )
+        ]
 
 
 class CommentSerializer(serializers.ModelSerializer):
