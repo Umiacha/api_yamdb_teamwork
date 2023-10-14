@@ -11,9 +11,10 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.filters import SearchFilter
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotFound, AuthenticationFailed, ParseError
 from rest_framework_simplejwt.tokens import AccessToken
 
+from .models import USERS_ROLES
 from .serializers import UserSerializer  # AdminSerializer,
 from .permissions import IsAdminOrSuperuser
 
@@ -77,7 +78,7 @@ def get_token(request):
 
 class AdminViewSet(ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer  # AdminSerializer
+    serializer_class = UserSerializer
     lookup_field = 'username'
     filter_backends = (SearchFilter,)
     permission_classes = (IsAdminOrSuperuser,)
@@ -85,15 +86,26 @@ class AdminViewSet(ModelViewSet):
     
     def perform_create(self, serializer):
         if 'role' in self.request.data:
+            users_roles = [role[1] for role in USERS_ROLES]
+            if self.request.data['role'] not in users_roles:
+                raise ParseError('Такая роль не предусмотрена!')
             serializer.save(role=self.request.data['role'])
         else:
             serializer.save()
     
     def perform_update(self, serializer):
         if 'role' in self.request.data:
+            users_roles = [role[1] for role in USERS_ROLES]
+            if self.request.data['role'] not in users_roles:
+                raise ParseError('Такая роль не предусмотрена!')
             serializer.save(role=self.request.data['role'])
         else:
             serializer.save()
+    
+    def update(self, request, *args, **kwargs):
+        if 'partial' not in kwargs:
+            self.http_method_not_allowed(request, *args, **kwargs)
+        return super().update(request, *args, **kwargs)
 
 
 class UserViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
@@ -102,5 +114,5 @@ class UserViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     def get_object(self):
         user = self.request.user
         if user.is_anonymous:
-            raise PermissionDenied('Доступно только авторизованным пользователям!')
+            raise AuthenticationFailed('Доступно только авторизованным пользователям!')
         return user

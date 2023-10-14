@@ -4,6 +4,12 @@ from django.core.validators import RegexValidator
 from django.db import models
 
 
+USERS_ROLES = [
+    ('user', 'user'),
+    ('moderator', 'moderator'),
+    ('admin', 'admin'),
+]
+
 def check_name(value):
     if value == 'me':
         raise ValidationError(
@@ -12,11 +18,6 @@ def check_name(value):
 
 
 class CustomUser(AbstractUser):
-    USERS_ROLES = [
-        ('user', 'user'),
-        ('moderator', 'moderator'),
-        ('admin', 'admin'),
-    ]
     username = models.CharField('Никнейм', max_length=150,
                                 unique=True, validators=[check_name, RegexValidator(regex='^[\w.@+-]+\Z')])
     email = models.CharField('Почта', max_length=254, unique=True)
