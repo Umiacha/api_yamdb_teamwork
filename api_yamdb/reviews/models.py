@@ -37,12 +37,8 @@ class Title(models.Model):
         "Год выпуска",
         validators=[MaxValueValidator(timezone.now().year)],
     )
-    rating = models.IntegerField(
-        "Рейтинг произведения", default=0
-    )
-    description = models.TextField(
-        "Описание", blank=True, default=''
-    )
+    rating = models.IntegerField("Рейтинг произведения", default=0)
+    description = models.TextField("Описание", blank=True, default="")
     genre = models.ManyToManyField(
         Genre, verbose_name="Slug жанра", through="GenreTitle"
     )
@@ -70,18 +66,23 @@ class GenreTitle(models.Model):
 class Review(models.Model):
     title_id = models.ForeignKey(
         Title,
+        verbose_name="ID произведения",
         on_delete=models.CASCADE,
         related_name="reviews",
     )
-    text = models.TextField()
+    text = models.TextField("Текст обзора")
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="reviews"
+        User,
+        verbose_name="Пользователь",
+        on_delete=models.CASCADE,
+        related_name="reviews",
     )
     score = models.FloatField(
+        "Оценка произведения",
         validators=[
             MinValueValidator(limit_value=0.0),
             MaxValueValidator(limit_value=10.0),
-        ]
+        ],
     )
     pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
 
@@ -102,11 +103,17 @@ class Review(models.Model):
 
 class Comment(models.Model):
     review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name="comments"
+        Review,
+        verbose_name="ID обзора",
+        on_delete=models.CASCADE,
+        related_name="comments",
     )
-    text = models.TextField()
+    text = models.TextField("Текст комментария")
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="comments"
+        User,
+        verbose_name="Пользователь",
+        on_delete=models.CASCADE,
+        related_name="comments",
     )
     pub_date = models.DateTimeField(
         "Дата добавления", auto_now_add=True, db_index=True
