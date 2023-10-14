@@ -14,7 +14,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.exceptions import NotFound
 from rest_framework_simplejwt.tokens import AccessToken
 
-from .serializers import AdminSerializer, UserSerializer
+from .serializers import UserSerializer  # AdminSerializer,
 
 
 User = get_user_model()
@@ -76,10 +76,22 @@ def get_token(request):
 
 class AdminViewSet(ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = AdminSerializer
+    serializer_class = UserSerializer  # AdminSerializer
     lookup_field = 'username'
     filter_backends = (SearchFilter,)
     search_fields = ('username',)
+    
+    def perform_create(self, serializer):
+        if 'role' in self.request.data:
+            serializer.save(role=self.request.data['role'])
+        else:
+            serializer.save()
+    
+    def perform_update(self, serializer):
+        if 'role' in self.request.data:
+            serializer.save(role=self.request.data['role'])
+        else:
+            serializer.save()
 
 
 class UserViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
