@@ -3,6 +3,7 @@ Django==3.2
 django-filter==23.3
 djangorestframework==3.12.4
 djangorestframework-simplejwt==4.7.2
+flake8==6.1.0
 PyJWT==2.1.0
 pytest==6.2.4
 pytest-django==4.4.0
