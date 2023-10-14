@@ -1,3 +1,10 @@
-# from django.contrib import admin
+from django.contrib import admin
 
-# Register your models here.
+from .models import CustomUser
+
+
+class UserAdmin(admin.ModelAdmin):
+    exclude = ('groups',)
+
+
+admin.site.register(CustomUser, UserAdmin)
