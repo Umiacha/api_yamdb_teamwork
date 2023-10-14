@@ -11,10 +11,11 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.filters import SearchFilter
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .serializers import UserSerializer  # AdminSerializer,
+from .permissions import IsAdminOrSuperuser
 
 
 User = get_user_model()
@@ -79,6 +80,7 @@ class AdminViewSet(ModelViewSet):
     serializer_class = UserSerializer  # AdminSerializer
     lookup_field = 'username'
     filter_backends = (SearchFilter,)
+    permission_classes = (IsAdminOrSuperuser,)
     search_fields = ('username',)
     
     def perform_create(self, serializer):
@@ -98,4 +100,7 @@ class UserViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     serializer_class = UserSerializer
 
     def get_object(self):
-        return self.request.user
+        user = self.request.user
+        if user.is_anonymous:
+            raise PermissionDenied('Доступно только авторизованным пользователям!')
+        return user
