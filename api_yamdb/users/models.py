@@ -34,6 +34,10 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
 # 1) Установить simple-jwt и переделать, если необходимо.
 # 2) Установить валидацию по регулярному выражению для CustomUser.username
