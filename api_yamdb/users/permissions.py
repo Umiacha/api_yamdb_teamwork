@@ -25,13 +25,13 @@ class AdminOrReadOnly(IsAdminOrSuperuser):
     def has_permission(self, request, view):
         return (
             request.method in SAFE_METHODS
-            or super().has_permission(self, request, view)
+            or super().has_permission(request, view)
         )
 
     def has_object_permission(self, request, view, obj):
         return (
             request.method in SAFE_METHODS
-            or super().has_object_permission(self, request, view, obj)
+            or super().has_object_permission(request, view, obj)
         )
 
 
@@ -42,14 +42,14 @@ class OwnerOrStaff(AdminOrReadOnly):
     """
     def has_permission(self, request, view):
         return (
-            super().has_permission(self, request, view)
+            super().has_permission(request, view)
             or request.user.is_authenticated()
             or request.user.role == 'moderator'
         )
 
     def has_object_permission(self, request, view, obj):
         return (
-            super().has_permission(self, request, view)
+            super().has_permission(request, view)
             or request.user == obj.author
             or request.user.role == 'moderator'
         )
