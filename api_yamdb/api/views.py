@@ -66,8 +66,7 @@ class CategoryViewSet(
     search_fields = ("name",)
 
 
-class ReviewViewSet(viewsets.ModelViewSet,
-):
+class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = (AdminOrReadOnly,)
