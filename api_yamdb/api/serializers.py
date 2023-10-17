@@ -2,7 +2,6 @@ import datetime as dt
 
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-from rest_framework.validators import UniqueTogetherValidator
 
 from reviews.models import Title, Genre, Category, Review, Comment
 
@@ -48,20 +47,34 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = "__all__" # потом надо явно указать поля
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=["title", "author"],
-                message="Ошибка, Вы уже добавили обзор на произведение",
+        fields = ["id", "title", "text", "author", "score", "pub_date"]
+        read_only_fields = ["title"]
+
+    def validate(self, data):
+        author = self.context["request"].user
+        title_id = self.context["view"].kwargs.get("title_id")
+        if (
+            self.instance is None
+            and Review.objects.filter(
+                title_id=title_id, author=author
+            ).exists()
+        ):
+            raise serializers.ValidationError(
+                "Вы уже написали обзор на данное произведение."
             )
-        ]
+        return data
+
+    def to_representation(self, instance):
+        """Удаление поля title из response"""
+        ret = super().to_representation(instance)
+        ret.pop("title", None)
+        return ret
 
 
 class CommentSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(read_only=True, slug_field="username")
 
     class Meta:
-        fields = "__all__" # потом надо явно указать поля
+        fields = ["id", "review", "text", "author", "pub_date"]
         model = Comment
-        read_only_fields = ("review",)
+        read_only_fields = ["review"]
