@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -11,7 +13,7 @@ from .serializers import (
     GenreSerializer,
     CategorySerializer,
 )
-from users.permissions import AdminOrReadOnly
+from users.permissions import AdminOrReadOnly, IsAdminOrSuperuser
 
 
 class TitleViewSet(
@@ -50,6 +52,11 @@ class GenreViewSet(
     lookup_field = "slug"
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
+
+    def perform_create(self, serializer):
+        category_string = self.request.data.get("category")
+        categor_dict = json.loads(category_string)
+        serializer.save(genre=categor_dict)
 
 
 class CategoryViewSet(

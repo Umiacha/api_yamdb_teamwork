@@ -25,13 +25,13 @@ class AdminOrReadOnly(IsAdminOrSuperuser):
     def has_permission(self, request, view):
         return (
             request.method in SAFE_METHODS
-            or super().has_permission(self, request, view)
+            or super().has_permission(request, view)
         )
 
     def has_object_permission(self, request, view, obj):
         return (
             request.method in SAFE_METHODS
-            or super().has_object_permission(self, request, view, obj)
+            or super().has_object_permission(request, view, obj)
         )
 
 
