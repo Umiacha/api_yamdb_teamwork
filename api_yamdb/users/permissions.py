@@ -61,11 +61,7 @@ class OwnerOrStaffOrReadOnly(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return (
-            request.method in SAFE_METHODS
-            or request.user.is_authenticated
-            or request.user.is_superuser
-        )
+        return request.method in SAFE_METHODS or request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
         return (
@@ -73,5 +69,4 @@ class OwnerOrStaffOrReadOnly(BasePermission):
             or request.user == obj.author
             or request.user.role == "moderator"
             or request.user.role == "admin"
-            or request.user.is_superuser
         )
