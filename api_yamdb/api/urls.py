@@ -12,10 +12,10 @@ from .views import (
 router = SimpleRouter()
 router.register(r"titles", TitleViewSet, basename="titles")
 router.register(
-    r"titles/(?P<title_id>[0-9]+)/rewiews", ReviewViewSet, basename="reviews"
+    r"titles/(?P<title_id>[0-9]+)/reviews", ReviewViewSet, basename="reviews"
 )
 router.register(
-    r"titles/(?P<title_id>[0-9]+)/rewiews/(?P<review_id>[0-9]+)/comments",
+    r"titles/(?P<title_id>[0-9]+)/reviews/(?P<review_id>[0-9]+)/comments",
     CommentViewSet,
     basename="comments",
 )

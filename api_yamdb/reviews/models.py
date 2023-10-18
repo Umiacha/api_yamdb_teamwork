@@ -35,6 +35,8 @@ class Title(models.Model):
     name = models.CharField("Название", max_length=256)
     year = models.IntegerField(
         "Год выпуска",
+        null=True,
+        blank=True,
         validators=[MaxValueValidator(timezone.now().year)],
     )
     rating = models.FloatField(
@@ -89,6 +91,14 @@ class Review(models.Model):
     )
     pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
 
+    class Meta:
+        unique_together = [("title", "author")]
+        verbose_name = "Обзор"
+        verbose_name_plural = "Обзоры"
+
+    def __str__(self) -> str:
+        return self.text
+
     @staticmethod
     def calc_average_score():
         return Review.objects.aggregate(models.Avg("score"))["score__avg"] or 0
@@ -97,13 +107,6 @@ class Review(models.Model):
         super().save(*args, **kwargs)
         self.title.rating = self.calc_average_score()
         self.title.save()
-
-    class Meta:
-        verbose_name = "Обзор"
-        verbose_name_plural = "Обзоры"
-
-    def __str__(self) -> str:
-        return self.text
 
 
 class Comment(models.Model):

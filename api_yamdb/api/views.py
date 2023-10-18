@@ -11,18 +11,18 @@ from .serializers import (
     GenreSerializer,
     CategorySerializer,
 )
-from users.permissions import AdminOrReadOnly
+from users.permissions import AdminOrReadOnly, OwnerOrStaffOrReadOnly
 
 
 class TitleFilter(rest_framework_filters.FilterSet):
-    genre = rest_framework_filters.CharFilter(field_name='genre__slug')
-    category = rest_framework_filters.CharFilter(field_name='category__slug')
-    year = rest_framework_filters.CharFilter(field_name='year')
-    name = rest_framework_filters.CharFilter(field_name='name')
+    genre = rest_framework_filters.CharFilter(field_name="genre__slug")
+    category = rest_framework_filters.CharFilter(field_name="category__slug")
+    year = rest_framework_filters.CharFilter(field_name="year")
+    name = rest_framework_filters.CharFilter(field_name="name")
 
     class Meta:
         model = Title
-        fields = ('genre', 'category', 'year', 'name')
+        fields = ("genre", "category", "year", "name")
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -31,7 +31,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (AdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
-    http_method_names = ['get', 'post', 'patch', 'delete', 'head']
+    http_method_names = ["get", "post", "patch", "delete", "head"]
 
 
 class GenreViewSet(
@@ -59,30 +59,31 @@ class CategoryViewSet(
     permission_classes = (AdminOrReadOnly,)
     lookup_field = "slug"
     filter_backends = (filters.SearchFilter,)
-    search_fields = ("name",)
+    search_fields = ["name"]
 
 
-class ReviewViewSet(viewsets.ModelViewSet,
-):
+class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (OwnerOrStaffOrReadOnly,)
+    http_method_names = ["get", "post", "patch", "delete", "head"]
 
     def get_title(self):
         return get_object_or_404(Title, pk=self.kwargs.get("title_id"))
 
     def get_queryset(self):
-        return self.get_title().reviews
+        return self.get_title().reviews.all()
 
     def perform_create(self, serializer):
-        review = self.get_title()
-        serializer.save(author=self.request.user, review=review)
+        title = self.get_title()
+        serializer.save(author=self.request.user, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (OwnerOrStaffOrReadOnly,)
+    http_method_names = ["get", "post", "patch", "delete", "head"]
 
     def get_review(self):
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
@@ -91,7 +92,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         )
 
     def get_queryset(self):
-        return self.get_review().comments
+        return self.get_review().comments.all()
 
     def perform_create(self, serializer):
         review = self.get_review()
