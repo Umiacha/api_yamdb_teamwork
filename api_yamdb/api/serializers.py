@@ -66,9 +66,9 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         """Удаление поля title из response"""
-        ret = super().to_representation(instance)
-        ret.pop("title", None)
-        return ret
+        title = super().to_representation(instance)
+        title.pop("title", None)
+        return title
 
 
 class CommentSerializer(serializers.ModelSerializer):

@@ -19,12 +19,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = (AdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = (
-        "category",
-        "genre",
-        "name",
-        "year",
-    )
+    filterset_fields = ("category", "genre__slug", "name", "year")
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
