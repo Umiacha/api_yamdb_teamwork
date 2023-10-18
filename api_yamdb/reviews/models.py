@@ -37,7 +37,10 @@ class Title(models.Model):
         "Год выпуска",
         validators=[MaxValueValidator(timezone.now().year)],
     )
-    rating = models.FloatField("Рейтинг произведения", default=0.0)
+    rating = models.FloatField(
+        "Рейтинг произведения", default=None,
+        blank=True, null=True
+    )
     description = models.TextField("Описание", blank=True, default="")
     genre = models.ManyToManyField(
         Genre, verbose_name="Slug жанра", through="GenreTitle"

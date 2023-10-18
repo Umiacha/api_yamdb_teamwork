@@ -1,4 +1,5 @@
 import datetime as dt
+import copy
 
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
@@ -19,7 +20,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ("name", "slug")
+        fields = ("name", "slug",)
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -46,9 +47,15 @@ class GenreForTitlleSerializer(GenreSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    genre = GenreForTitlleSerializer(many=True)
-    category = CategoryForTitleSerializer()
-
+    genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(),
+        slug_field='slug',
+        many=True
+    )
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug'
+    )
     class Meta:
         model = Title
         fields = (
@@ -69,30 +76,14 @@ class TitleSerializer(serializers.ModelSerializer):
             )
         return value
 
-    def to_internal_value(self, data):
-        genre_data = data.get("genre")
-        category_data = data.get("category")
-        if category_data:
-            category_objects = Category.objects.get(slug=category_data)
-            category_list = CategorySerializer(category_objects).data
-            data["category"] = category_list
-        if genre_data:
-            genre_objects = Genre.objects.filter(slug__in=genre_data)
-            genre_list = GenreSerializer(genre_objects, many=True).data
-            data["genre"] = genre_list
-        return super().to_internal_value(data)
-
-    def create(self, validated_data):
-        genres = validated_data.pop('genre')
-        category_data = validated_data.pop('category')
-        print(category_data.get('slug'))
-        category = Category.objects.filter(slug=category_data.get('slug')).first()
-        print(category)
-        title = Title.objects.create(**validated_data, category=category)
-        for genre in genres:
-            current_genre = Genre.objects.get(slug=genre.get('slug'))
-            GenreTitle.objects.create(genre=current_genre, title=title)
-        return title
+    def to_representation(self, instance):        
+        title_obj = super().to_representation(instance)
+        category_name = Category.objects.get(slug=title_obj.get('category'))
+        title_obj["category"] = {"name": category_name.name, "slug": title_obj.get('category')}
+        genre_slugs = title_obj.get('genre')
+        genres = Genre.objects.filter(slug__in=genre_slugs)
+        title_obj["genre"] = [{"name": genre.name, "slug": genre.slug}for genre in genres]
+        return title_obj
 
 
 class ReviewSerializer(serializers.ModelSerializer):
