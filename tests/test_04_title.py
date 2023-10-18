@@ -161,7 +161,7 @@ class Test04TitleAPI:
         assert len(data['results']) == 2, (
             f'Проверьте, что для эндпоинта `{self.TITLES_URL}` реализована '
             'возможность фильтрации по полю `genre` с использованием '
-            'параметра `slug` жанра.'
+            f'параметра `slug` жанра.{data["results"]}'
         )
 
         response = admin_client.get(
@@ -171,7 +171,7 @@ class Test04TitleAPI:
         assert len(data['results']) == 1, (
             f'Проверьте, что для эндпоинта `{self.TITLES_URL}` реализована '
             'возможность фильтрации по полю `category` с использованием '
-            'параметра `slug` категории.'
+            'параметра `slug` категории.' 
         )
 
         response = admin_client.get(

@@ -9,8 +9,8 @@ users_router_v1.register(r'users', AdminViewSet)
 
 
 urlpatterns = [
-    path('auth/signup/', get_confirmation_code),
     path('auth/token/', get_token),
+    path('auth/signup/', get_confirmation_code),
     path('users/me/', UserViewSet.as_view({'get': 'retrieve',
                                            'patch': 'partial_update'})),
     path('', include(users_router_v1.urls)),
