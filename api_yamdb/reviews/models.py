@@ -9,7 +9,7 @@ User = get_user_model()
 
 class Category(models.Model):
     name = models.CharField("Название", max_length=256)
-    slug = models.SlugField("Slug категории", unique=True, max_length=50)
+    slug = models.SlugField("Slug категории", max_length=50)
 
     class Meta:
         verbose_name = "Категория"
@@ -21,7 +21,7 @@ class Category(models.Model):
 
 class Genre(models.Model):
     name = models.CharField("Название", max_length=256)
-    slug = models.SlugField("Slug жанра", unique=True, max_length=50)
+    slug = models.SlugField("Slug жанра", max_length=50)
 
     class Meta:
         verbose_name = "Жанр"
@@ -39,7 +39,10 @@ class Title(models.Model):
         blank=True,
         validators=[MaxValueValidator(timezone.now().year)],
     )
-    rating = models.FloatField("Рейтинг произведения", default=0.0)
+    rating = models.FloatField(
+        "Рейтинг произведения", default=None,
+        blank=True, null=True
+    )
     description = models.TextField("Описание", blank=True, default="")
     genre = models.ManyToManyField(
         Genre, verbose_name="Slug жанра", through="GenreTitle"

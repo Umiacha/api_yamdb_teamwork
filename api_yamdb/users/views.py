@@ -1,5 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from django.conf import settings
+from django.core.mail import send_mail
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -55,8 +57,11 @@ def get_confirmation_code(request):
         serializer.is_valid(raise_exception=True)
         user = User.objects.create(**serializer.validated_data)
     user.create_confirmation_code()
-    user.email_user(
-        subject="Код подтверждения", message=user.confirmation_code
+    send_mail(
+        subject="Код подтверждения",
+        message=user.confirmation_code,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[user.email],
     )
     return Response(
         data={"username": user.username, "email": user.email},
