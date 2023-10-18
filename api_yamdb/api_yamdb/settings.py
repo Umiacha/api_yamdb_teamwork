@@ -127,3 +127,10 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+EMAIL_HOST = 'smtp.mail.ru'  # Адрес нашего SMTP-сервера
+EMAIL_HOST_USER = 'hello.sv@mail.ru'  # Имя почтового ящика для аутентификации на стороне SMTP-сервера (Mail.ru).
+EMAIL_HOST_PASSWORD = 'z7ztMpwEThG6uvhrbR9r'  # Пароль для почтового приложения для использования Mail.ru как SMTP-сервер.
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Имя почтового ящика для автоматических рассылок.
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
