@@ -1,5 +1,4 @@
 from django.shortcuts import get_object_or_404
-from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.core.mail import send_mail
 
@@ -16,9 +15,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from .models import USERS_ROLES
 from .serializers import UserSerializer
 from .permissions import IsAdminOrSuperuser
-
-
-User = get_user_model()
+from reviews.models import User
 
 
 @api_view(["POST"])
@@ -32,7 +29,6 @@ def get_token(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
     user = get_object_or_404(User, username=username)
-    print(user)
     if not code or code != user.confirmation_code:
         return Response(
             data={"confirmation_code": "Поле некорректно или отсутствует!"},
