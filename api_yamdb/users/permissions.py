@@ -27,9 +27,7 @@ class AdminOrReadOnly(IsAdminOrSuperuser):
         )
 
     def has_object_permission(self, request, view, obj):
-        return request.method in SAFE_METHODS or super().has_object_permission(
-            request, view, obj
-        )
+        return self.has_permission(request, view)
 
 
 class OwnerOrStaff(AdminOrReadOnly):
