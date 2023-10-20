@@ -1,16 +1,13 @@
 from django.apps import AppConfig
-from django.core.signals import request_finished
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 
 class UsersConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'users'
+    name = "users"
+    default_auto_field = "django.db.models.BigAutoField"
 
     def ready(self):
-        from .signals import is_user_staff_or_not
-
-        request_finished.connect(
-            is_user_staff_or_not,
-            sender='users.CustomUser',
-            dispatch_uid='unique_id'
-        )
+        @receiver(pre_save, sender="users.CustomUser")
+        def is_user_staff_or_not(sender, instance, **kwargs):
+            instance.clean_is_staff()

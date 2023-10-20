@@ -32,16 +32,6 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = ("name", "slug")
 
 
-class CategoryForTitleSerializer(CategorySerializer):
-    slug = serializers.CharField()
-    name = serializers.CharField(required=False)
-
-
-class GenreForTitlleSerializer(GenreSerializer):
-    slug = serializers.CharField()
-    name = serializers.CharField(required=False)
-
-
 class TitleSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
         queryset=Genre.objects.all(), slug_field="slug", many=True
@@ -72,9 +62,9 @@ class TitleSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         title_obj = super().to_representation(instance)
-        category_name = Category.objects.get(slug=title_obj.get("category"))
+        categories = Category.objects.get(slug=title_obj.get("category"))
         title_obj["category"] = {
-            "name": category_name.name,
+            "name": categories.name,
             "slug": title_obj.get("category"),
         }
         genre_slugs = title_obj.get("genre")
