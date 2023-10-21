@@ -33,6 +33,7 @@ class CustomUser(AbstractUser):
         unique=True,
         validators=[check_name, RegexValidator(regex=r"^[\w.@+-]+\Z")],
     )
+    password = models.CharField('Ненужный пароль', max_length=128, blank=True)
     email = models.EmailField(
         verbose_name="Почта", max_length=MAX_EMAIL_LENGTH, unique=True
     )
@@ -70,6 +71,7 @@ class CustomUser(AbstractUser):
             self.is_moderator = False
             self.is_admin = False
             self.is_staff = False
+        self.full_clean()
 
     def save(self, *args, **kwargs):
         self.pre_save()
