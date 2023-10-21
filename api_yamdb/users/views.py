@@ -45,14 +45,16 @@ def get_token(request):
 @permission_classes([AllowAny])
 def get_confirmation_code(request):
     serializer = UserSerializer(data=request.data)
+    # serializer.is_valid(raise_exception=True)
     try:
         user = User.objects.get(
             username=request.data.get("username"),
             email=request.data.get("email"),
         )
-    except Exception:
+    except User.DoesNotExist:
         serializer.is_valid(raise_exception=True)
         user = User.objects.create(**serializer.validated_data)
+    # user = User.objects.get_or_create(**serializer.validated_data)[0]
     user.create_confirmation_code()
     send_mail(
         subject="Код подтверждения",
