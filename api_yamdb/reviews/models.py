@@ -1,17 +1,17 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 
-from api_yamdb.constraints import MAX_NAME_LENGTH, MAX_SLUG_LENGTH
+from api_yamdb.constants import MAX_SLUG_LENGTH
+from core.models import (
+    BaseReviewModel, BaseNameModel
+)
 
 User = get_user_model()
 
 
-class Category(models.Model):
-    name = models.CharField(
-        verbose_name="Название", max_length=MAX_NAME_LENGTH
-    )
+class Category(BaseNameModel):
     slug = models.SlugField(
         verbose_name="Slug категории", max_length=MAX_SLUG_LENGTH
     )
@@ -25,10 +25,7 @@ class Category(models.Model):
         return self.name
 
 
-class Genre(models.Model):
-    name = models.CharField(
-        verbose_name="Название", max_length=MAX_NAME_LENGTH
-    )
+class Genre(BaseNameModel):
     slug = models.SlugField(
         verbose_name="Slug жанра", max_length=MAX_SLUG_LENGTH
     )
@@ -42,11 +39,8 @@ class Genre(models.Model):
         return self.name
 
 
-class Title(models.Model):
-    name = models.CharField(
-        verbose_name="Название", max_length=MAX_NAME_LENGTH
-    )
-    year = models.IntegerField(
+class Title(BaseNameModel):
+    year = models.PositiveSmallIntegerField(
         verbose_name="Год выпуска",
         null=True,
         blank=True,
@@ -101,29 +95,24 @@ class GenreTitle(models.Model):
         return self.title - self.genre
 
 
-class Review(models.Model):
+class Review(BaseReviewModel):
     title = models.ForeignKey(
         Title,
         verbose_name="ID произведения",
         on_delete=models.CASCADE,
         related_name="reviews",
     )
-    text = models.TextField(verbose_name="Текст обзора")
-    author = models.ForeignKey(
-        User,
-        verbose_name="Пользователь",
-        on_delete=models.CASCADE,
-        related_name="reviews",
-    )
-    score = models.IntegerField(
+    score = models.PositiveSmallIntegerField(
         verbose_name="Оценка произведения",
         validators=[
             MinValueValidator(limit_value=1),
             MaxValueValidator(limit_value=10),
         ],
     )
-    pub_date = models.DateTimeField(
-        verbose_name="Дата публикации", auto_now_add=True
+    author = models.ForeignKey(
+        User,
+        verbose_name="Пользователь",
+        on_delete=models.CASCADE,
     )
 
     class Meta:
@@ -145,22 +134,17 @@ class Review(models.Model):
         self.title.save()
 
 
-class Comment(models.Model):
+class Comment(BaseReviewModel):
     review = models.ForeignKey(
         Review,
         verbose_name="ID обзора",
         on_delete=models.CASCADE,
         related_name="comments",
     )
-    text = models.TextField(verbose_name="Текст комментария")
     author = models.ForeignKey(
         User,
         verbose_name="Пользователь",
         on_delete=models.CASCADE,
-        related_name="comments",
-    )
-    pub_date = models.DateTimeField(
-        verbose_name="Дата добавления", auto_now_add=True, db_index=True
     )
 
     class Meta:

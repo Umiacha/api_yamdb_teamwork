@@ -13,6 +13,7 @@ class CommentInline(admin.StackedInline):
     extra = 0
 
 
+@admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
     list_display = (
         "name",
@@ -32,6 +33,7 @@ class TitleAdmin(admin.ModelAdmin):
     exclude = ("rating",)
 
 
+@admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = (
         "name",
@@ -40,6 +42,7 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ("name",)
 
 
+@admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = (
         "title",
@@ -53,6 +56,7 @@ class ReviewAdmin(admin.ModelAdmin):
     inlines = (CommentInline,)
 
 
+@admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
     list_display = (
         "name",
@@ -61,15 +65,11 @@ class GenreAdmin(admin.ModelAdmin):
     search_fields = ("name",)
 
 
+@admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ("review", "text", "author", "pub_date")
     search_fields = ("review",)
     list_filter = ("author",)
 
 
-admin.site.register(Title, TitleAdmin)
-admin.site.register(Category, CategoryAdmin)
-admin.site.register(Review, ReviewAdmin)
-admin.site.register(Genre, GenreAdmin)
-admin.site.register(Comment, CommentAdmin)
 admin.site.empty_value_display = "Отсутствует"
