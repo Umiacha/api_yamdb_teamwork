@@ -10,9 +10,7 @@ class IsAdminOrSuperuser(BasePermission):
         )
 
     def has_object_permission(self, request, view, obj):
-        return request.user.is_authenticated and (
-            request.user.is_superuser or request.user.role == "admin"
-        )
+        return self.has_permission(request, view)
 
 
 class AdminOrReadOnly(IsAdminOrSuperuser):
