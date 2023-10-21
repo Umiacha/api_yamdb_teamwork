@@ -1,6 +1,4 @@
-from collections.abc import Iterable
 import time
-import re
 
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
@@ -23,7 +21,9 @@ USERS_ROLES = [
 def check_name(value):
     lower_value = value.lower()
     if lower_value == 'me':
-        raise ValidationError(f'Нельзя создать пользователя с никнеймом {value}!')
+        raise ValidationError(
+            f'Нельзя создать пользователя с никнеймом {value}!'
+        )
 
 
 class CustomUser(AbstractUser):
