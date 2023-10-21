@@ -1,28 +1,12 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, mixins, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import rest_framework as rest_framework_filters
+from rest_framework import filters, mixins, viewsets
 
-from reviews.models import Title, Comment, Review, Genre, Category
-from .serializers import (
-    TitleSerializer,
-    CommentSerializer,
-    ReviewSerializer,
-    GenreSerializer,
-    CategorySerializer,
-)
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.permissions import AdminOrReadOnly, OwnerOrStaffOrReadOnly
-
-
-class TitleFilter(rest_framework_filters.FilterSet):
-    genre = rest_framework_filters.CharFilter(field_name="genre__slug")
-    category = rest_framework_filters.CharFilter(field_name="category__slug")
-    year = rest_framework_filters.CharFilter(field_name="year")
-    name = rest_framework_filters.CharFilter(field_name="name")
-
-    class Meta:
-        model = Title
-        fields = ("genre", "category", "year", "name")
+from .filters import TitleFilter
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer, TitleSerializer)
 
 
 class TitleViewSet(viewsets.ModelViewSet):

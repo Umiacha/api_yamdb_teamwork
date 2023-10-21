@@ -16,13 +16,14 @@ from .models import USERS_ROLES
 from .serializers import UserSerializer
 from .permissions import IsAdminOrSuperuser
 from reviews.models import User
+from api_yamdb.constants import INDEX_OF_ROLE
 
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def get_token(request):
-    username = request.data.get("username", None)
-    code = request.data.get("confirmation_code", None)
+    username = request.data.get("username")
+    code = request.data.get("confirmation_code")
     if not username:
         return Response(
             data={"username": "Поле некорректно или отсутствует!"},
@@ -46,8 +47,8 @@ def get_confirmation_code(request):
     serializer = UserSerializer(data=request.data)
     try:
         user = User.objects.get(
-            username=request.data.get("username", None),
-            email=request.data.get("email", None),
+            username=request.data.get("username"),
+            email=request.data.get("email"),
         )
     except Exception:
         serializer.is_valid(raise_exception=True)
@@ -75,7 +76,7 @@ class AdminViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         if "role" in self.request.data:
-            users_roles = [role[1] for role in USERS_ROLES]
+            users_roles = [role[INDEX_OF_ROLE] for role in USERS_ROLES]
             if self.request.data["role"] not in users_roles:
                 raise ParseError("Такая роль не предусмотрена!")
             serializer.save(role=self.request.data["role"])
@@ -84,7 +85,7 @@ class AdminViewSet(ModelViewSet):
 
     def perform_update(self, serializer):
         if "role" in self.request.data:
-            users_roles = [role[1] for role in USERS_ROLES]
+            users_roles = [role[INDEX_OF_ROLE] for role in USERS_ROLES]
             if self.request.data["role"] not in users_roles:
                 raise ParseError("Такая роль не предусмотрена!")
             serializer.save(role=self.request.data["role"])
