@@ -1,10 +1,10 @@
 import time
 
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
 
+from .validators import check_name
 from api_yamdb.constants import (
     MAX_USERNAME_ROLE_CODE_LENGTH,
     MAX_EMAIL_LENGTH, MAX_PASSWORD_LENGHT,
@@ -16,14 +16,6 @@ USERS_ROLES = [
     (MODERATOR, "Модератор"),
     (ADMIN, "Администратор"),
 ]
-
-
-def check_name(value):
-    lower_value = value.lower()
-    if lower_value == "me":
-        raise ValidationError(
-            f"Нельзя создать пользователя с никнеймом {value}!"
-        )
 
 
 class CustomUser(AbstractUser):
