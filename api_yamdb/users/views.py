@@ -49,7 +49,9 @@ def get_confirmation_code(request):
     username = serializer.initial_data.get('username')
     email = serializer.initial_data.get('email')
     try:
-        user, created = User.objects.get_or_create(username=username, email=email)
+        user, created = User.objects.get_or_create(
+            username=username, email=email
+        )
     except (ValidationError, IntegrityError):
         serializer.is_valid(raise_exception=True)
     user.create_confirmation_code()

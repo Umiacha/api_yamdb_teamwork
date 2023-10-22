@@ -33,7 +33,9 @@ class CustomUser(AbstractUser):
         unique=True,
         validators=[check_name, RegexValidator(regex=r"^[\w.@+-]+\Z")],
     )
-    password = models.CharField("Ненужный пароль", max_length=MAX_PASSWORD_LENGHT, blank=True)
+    password = models.CharField(
+        "Пароль", max_length=MAX_PASSWORD_LENGHT, blank=True
+    )
     email = models.EmailField(
         verbose_name="Почта", max_length=MAX_EMAIL_LENGTH, unique=True
     )
