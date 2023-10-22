@@ -1,6 +1,4 @@
-from collections.abc import Iterable
 import time
-import re
 
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
@@ -23,7 +21,9 @@ USERS_ROLES = [
 def check_name(value):
     lower_value = value.lower()
     if lower_value == 'me':
-        raise ValidationError(f'Нельзя создать пользователя с никнеймом {value}!')
+        raise ValidationError(
+            f'Нельзя создать пользователя с никнеймом {value}!'
+        )
 
 
 class CustomUser(AbstractUser):
@@ -33,6 +33,7 @@ class CustomUser(AbstractUser):
         unique=True,
         validators=[check_name, RegexValidator(regex=r"^[\w.@+-]+\Z")],
     )
+    password = models.CharField('Ненужный пароль', max_length=128, blank=True)
     email = models.EmailField(
         verbose_name="Почта", max_length=MAX_EMAIL_LENGTH, unique=True
     )
@@ -70,6 +71,7 @@ class CustomUser(AbstractUser):
             self.is_moderator = False
             self.is_admin = False
             self.is_staff = False
+        self.full_clean()
 
     def save(self, *args, **kwargs):
         self.pre_save()

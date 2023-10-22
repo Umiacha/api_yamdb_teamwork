@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.core.mail import send_mail
+from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -45,14 +47,12 @@ def get_token(request):
 @permission_classes([AllowAny])
 def get_confirmation_code(request):
     serializer = UserSerializer(data=request.data)
+    username = serializer.initial_data.get('username')
+    email = serializer.initial_data.get('email')
     try:
-        user = User.objects.get(
-            username=request.data.get("username"),
-            email=request.data.get("email"),
-        )
-    except Exception:
+        user = User.objects.get_or_create(username=username, email=email)[0]
+    except (ValidationError, IntegrityError):
         serializer.is_valid(raise_exception=True)
-        user = User.objects.create(**serializer.validated_data)
     user.create_confirmation_code()
     send_mail(
         subject="Код подтверждения",
