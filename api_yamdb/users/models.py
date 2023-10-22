@@ -7,8 +7,8 @@ from django.db import models
 
 from api_yamdb.constants import (
     MAX_USERNAME_ROLE_CODE_LENGTH,
-    MAX_EMAIL_LENGTH, USER,
-    MODERATOR, ADMIN
+    MAX_EMAIL_LENGTH, MAX_PASSWORD_LENGHT,
+    USER, MODERATOR, ADMIN
 )
 
 USERS_ROLES = [
@@ -20,9 +20,9 @@ USERS_ROLES = [
 
 def check_name(value):
     lower_value = value.lower()
-    if lower_value == 'me':
+    if lower_value == "me":
         raise ValidationError(
-            f'Нельзя создать пользователя с никнеймом {value}!'
+            f"Нельзя создать пользователя с никнеймом {value}!"
         )
 
 
@@ -33,7 +33,7 @@ class CustomUser(AbstractUser):
         unique=True,
         validators=[check_name, RegexValidator(regex=r"^[\w.@+-]+\Z")],
     )
-    password = models.CharField('Ненужный пароль', max_length=128, blank=True)
+    password = models.CharField("Ненужный пароль", max_length=MAX_PASSWORD_LENGHT, blank=True)
     email = models.EmailField(
         verbose_name="Почта", max_length=MAX_EMAIL_LENGTH, unique=True
     )
