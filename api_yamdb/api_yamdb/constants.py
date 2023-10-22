@@ -5,7 +5,7 @@ MAX_USERNAME_ROLE_CODE_LENGTH = 150
 MAX_EMAIL_LENGTH = 254
 MAX_PASSWORD_LENGHT = 128
 
-#Коснтанты для ролей
+# Коснтанты для ролей
 USER = "user"
 MODERATOR = "moderator"
 ADMIN = "admin"
