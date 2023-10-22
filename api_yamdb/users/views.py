@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.core.mail import send_mail
+from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -21,8 +23,8 @@ from reviews.models import User
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def get_token(request):
-    username = request.data.get("username", None)
-    code = request.data.get("confirmation_code", None)
+    username = request.data.get("username")
+    code = request.data.get("confirmation_code")
     if not username:
         return Response(
             data={"username": "Поле некорректно или отсутствует!"},
@@ -44,14 +46,12 @@ def get_token(request):
 @permission_classes([AllowAny])
 def get_confirmation_code(request):
     serializer = UserSerializer(data=request.data)
+    username = serializer.initial_data.get('username')
+    email = serializer.initial_data.get('email')
     try:
-        user = User.objects.get(
-            username=request.data.get("username", None),
-            email=request.data.get("email", None),
-        )
-    except Exception:
+        user, created = User.objects.get_or_create(username=username, email=email)
+    except (ValidationError, IntegrityError):
         serializer.is_valid(raise_exception=True)
-        user = User.objects.create(**serializer.validated_data)
     user.create_confirmation_code()
     send_mail(
         subject="Код подтверждения",
@@ -75,7 +75,7 @@ class AdminViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         if "role" in self.request.data:
-            users_roles = [role[1] for role in USERS_ROLES]
+            users_roles = [role for role, rus_role in USERS_ROLES]
             if self.request.data["role"] not in users_roles:
                 raise ParseError("Такая роль не предусмотрена!")
             serializer.save(role=self.request.data["role"])
@@ -84,7 +84,7 @@ class AdminViewSet(ModelViewSet):
 
     def perform_update(self, serializer):
         if "role" in self.request.data:
-            users_roles = [role[1] for role in USERS_ROLES]
+            users_roles = [role for role, rus_role in USERS_ROLES]
             if self.request.data["role"] not in users_roles:
                 raise ParseError("Такая роль не предусмотрена!")
             serializer.save(role=self.request.data["role"])

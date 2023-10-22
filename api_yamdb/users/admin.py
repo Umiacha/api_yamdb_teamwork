@@ -1,9 +1,12 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import Group
 
 from .models import CustomUser
 
 
-class UserAdmin(admin.ModelAdmin):
+@admin.register(CustomUser)
+class UserAdmin(BaseUserAdmin):
     list_display = (
         "username",
         "email",
@@ -12,7 +15,7 @@ class UserAdmin(admin.ModelAdmin):
         "bio",
         "role",
     )
-    exclude = ("groups",)
+    list_editable = ("role",)
 
 
-admin.site.register(CustomUser, UserAdmin)
+admin.site.unregister(Group)

@@ -5,21 +5,25 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
 
-from api_yamdb.constraints import (
+from api_yamdb.constants import (
     MAX_USERNAME_ROLE_CODE_LENGTH,
-    MAX_EMAIL_LENGTH,
+    MAX_EMAIL_LENGTH, MAX_PASSWORD_LENGHT,
+    USER, MODERATOR, ADMIN
 )
 
 USERS_ROLES = [
-    ("user", "user"),
-    ("moderator", "moderator"),
-    ("admin", "admin"),
+    (USER, "Пользователь"),
+    (MODERATOR, "Модератор"),
+    (ADMIN, "Администратор"),
 ]
 
 
 def check_name(value):
-    if value == "me":
-        raise ValidationError('Нельзя создать пользователя с никнеймом "me"!')
+    lower_value = value.lower()
+    if lower_value == "me":
+        raise ValidationError(
+            f"Нельзя создать пользователя с никнеймом {value}!"
+        )
 
 
 class CustomUser(AbstractUser):
@@ -29,6 +33,7 @@ class CustomUser(AbstractUser):
         unique=True,
         validators=[check_name, RegexValidator(regex=r"^[\w.@+-]+\Z")],
     )
+    password = models.CharField("Ненужный пароль", max_length=MAX_PASSWORD_LENGHT, blank=True)
     email = models.EmailField(
         verbose_name="Почта", max_length=MAX_EMAIL_LENGTH, unique=True
     )
@@ -44,13 +49,33 @@ class CustomUser(AbstractUser):
         max_length=MAX_USERNAME_ROLE_CODE_LENGTH,
         blank=True,
     )
+    is_admin = models.BooleanField(
+        verbose_name="Является администратором",
+        default=False,
+    )
+    is_moderator = models.BooleanField(
+        verbose_name="Является модератором",
+        default=False
+    )
 
-    def clean_is_staff(self) -> None:
-        if self.role == "admin" or self.is_superuser:
+    def pre_save(self):
+        if self.role == ADMIN or self.is_superuser:
+            self.is_admin = True
             self.is_staff = True
-        else:
+            self.is_moderator = False
+        elif self.role == MODERATOR:
+            self.is_moderator = True
+            self.is_admin = False
             self.is_staff = False
-        return super().clean()
+        else:
+            self.is_moderator = False
+            self.is_admin = False
+            self.is_staff = False
+        self.full_clean()
+
+    def save(self, *args, **kwargs):
+        self.pre_save()
+        super().save(*args, **kwargs)
 
     def create_confirmation_code(self):
         """
