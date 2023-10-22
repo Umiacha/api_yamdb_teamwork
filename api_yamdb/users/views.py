@@ -62,7 +62,7 @@ def get_confirmation_code(request):
         subject="Код подтверждения",
         message=user.confirmation_code,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[email,],
+        recipient_list=[email],
     )
     return Response(
         serializer.data,
