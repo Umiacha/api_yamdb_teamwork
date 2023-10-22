@@ -6,7 +6,7 @@ from django.db.utils import IntegrityError
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
@@ -15,7 +15,7 @@ from rest_framework.exceptions import AuthenticationFailed, ParseError
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .models import USERS_ROLES
-from .serializers import UserSerializer
+from .serializers import UserSerializer, UserCrateSerializer
 from .permissions import IsAdminOrSuperuser
 from reviews.models import User
 
@@ -45,24 +45,27 @@ def get_token(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def get_confirmation_code(request):
-    serializer = UserSerializer(data=request.data)
-    username = serializer.initial_data.get('username')
-    email = serializer.initial_data.get('email')
+    serializer = UserCrateSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    username = serializer.data["username"]
+    email = serializer.data["email"]
     try:
         user, created = User.objects.get_or_create(
             username=username, email=email
         )
-    except (ValidationError, IntegrityError):
-        serializer.is_valid(raise_exception=True)
+    except (IntegrityError, ValidationError):
+        raise serializers.ValidationError(
+            "Пользователь с такими данными уже существует"
+        )
     user.create_confirmation_code()
     send_mail(
         subject="Код подтверждения",
         message=user.confirmation_code,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
+        recipient_list=[email,],
     )
     return Response(
-        data={"username": user.username, "email": user.email},
+        serializer.data,
         status=status.HTTP_200_OK,
     )
 
